@@ -1,0 +1,19 @@
+# Terraform state files (contain sensitive info)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Sensitive files
+*.pem
+*.ppk
+terraform.tfvars
+
+# OS files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Logs
+*.log

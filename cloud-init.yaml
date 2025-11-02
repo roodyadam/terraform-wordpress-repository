@@ -1,0 +1,51 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - apache2
+  - mysql-server
+  - php
+  - php-mysql
+  - libapache2-mod-php
+  - php-cli
+  - php-cgi
+  - php-gd
+  - php-curl
+  - php-mbstring
+  - php-xml
+  - php-xmlrpc
+  - wget
+
+runcmd:
+  # Configure MySQL
+  - systemctl start mysql
+  - systemctl enable mysql
+  - mysql -e "CREATE DATABASE wordpress;"
+  - mysql -e "CREATE USER 'wpuser'@'localhost' IDENTIFIED BY 'YourStrongPassword123!';"
+  - mysql -e "GRANT ALL PRIVILEGES ON wordpress.* TO 'wpuser'@'localhost';"
+  - mysql -e "FLUSH PRIVILEGES;"
+  
+  # Download and install WordPress
+  - cd /tmp
+  - wget https://wordpress.org/latest.tar.gz
+  - tar -xzf latest.tar.gz
+  - cp -r wordpress/* /var/www/html/
+  - rm /var/www/html/index.html
+  
+  # Configure WordPress
+  - cd /var/www/html
+  - cp wp-config-sample.php wp-config.php
+  - sed -i 's/database_name_here/wordpress/' wp-config.php
+  - sed -i 's/username_here/wpuser/' wp-config.php
+  - sed -i 's/password_here/YourStrongPassword123!/' wp-config.php
+  
+  # Set permissions
+  - chown -R www-data:www-data /var/www/html
+  - chmod -R 755 /var/www/html
+  
+  # Restart Apache
+  - systemctl restart apache2
+  - systemctl enable apache2
+
+final_message: "WordPress installation completed! Access it via your EC2 public IP"
